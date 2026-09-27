@@ -4,6 +4,10 @@ services:
     container: postgres_fds
     restart: always
     shm_size: 128mb
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-freight-dock-scheduler}"
+      POSTGRES_USER: "${POSTGRES_USER:-fds_admin}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-fds_secret_pass}"
     ports:
       - "5432:5432"
     networks:
