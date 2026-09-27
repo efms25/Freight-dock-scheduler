@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:18
+    container: postgres_fds
+    restart: always
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    networks:
+      - fds_network
+  adminer:
+    image: adminer
+    container_name: adminer_poc
+    restart: always
+    ports:
+      - 8085:8080
+    networks:
+      - fds_network
+  
+networks:
+  fds_network:
+    driver: bridge
