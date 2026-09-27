@@ -10,6 +10,8 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-fds_secret_pass}"
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     networks:
       - fds_network
   adminer:
@@ -19,8 +21,9 @@ services:
     ports:
       - 8085:8080
     networks:
-      - fds_network
-  
+      - fds_network  
 networks:
   fds_network:
     driver: bridge
+volumes:
+  pgdata:
