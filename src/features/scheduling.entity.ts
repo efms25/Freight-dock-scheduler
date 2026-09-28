@@ -5,13 +5,14 @@ import { CreateSchedulingProps, SchedulingProps } from "./scheduling.interface";
 export class Scheduling {
   constructor(private readonly props: SchedulingProps) {}
 
-  static create({carrier, dock, licensePlate}: CreateSchedulingProps): Scheduling {
+  static create({carrier, dock, licensePlate, files}: CreateSchedulingProps): Scheduling {
     return new Scheduling({
         carrier,
         dock,
         licensePlate,
         date: new Date(),
-        status: ScheduleStatus.open
+        status: ScheduleStatus.open,
+        files: files ?? []
     })
   }
 
@@ -25,5 +26,9 @@ export class Scheduling {
     }
     
     this.props.status = status;
+  }
+
+  public addFile(filename: string) {
+    this.props.files.push(filename);
   }
 }

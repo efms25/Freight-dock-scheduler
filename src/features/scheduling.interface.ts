@@ -5,11 +5,13 @@ export interface SchedulingProps {
   carrier: string;
   licensePlate: string;
   status: ScheduleStatus;
-  date: Date
+  date: Date,
+  files: Array<string>
 }
 
 export interface CreateSchedulingProps {
   dock: string;
   carrier: string;
-  licensePlate: string
+  licensePlate: string;
+  files?: Array<string>
 }
