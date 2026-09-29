@@ -1,9 +1,9 @@
 import { ScheduleStatus } from "./schedule-status.enum";
 
-export type DeliveryId = number | string
+export type SchedulingId = number | string
 
 export interface SchedulingProps {
-  id?: DeliveryId;
+  id?: SchedulingId;
   dock: string;
   carrier: string;
   licensePlate: string;
