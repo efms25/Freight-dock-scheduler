@@ -1,6 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config({ quiet: true });
 
+const env = process.env.NODE_ENV || "development";
+
+dotenv.config({ path: `.env.${env}`});
+
 import startApp from "./src/app";
 import { logger } from "./src/shared/logger";
 
