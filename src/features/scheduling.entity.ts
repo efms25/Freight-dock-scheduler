@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { ScheduleStatus } from "./schedule-status.enum";
 import { CreateSchedulingProps, SchedulingProps } from "./scheduling.interface";
 
@@ -37,6 +38,7 @@ export class Scheduling {
 
   public assignStatus(status: ScheduleStatus) {
     if (status === this.props.status) {
+      logger.debug(`Status log already assigned for: ${status} of ${this.props.id} - ${this.props.licensePlate}`)
       throw new ScheduleStatusAlreadyAssignedError();
     }
 

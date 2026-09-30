@@ -1,19 +1,22 @@
-import { db } from "../shared/database/db";
 import { ResultNotFoundError } from "../shared/errors/result-not-found.error";
 import { DatabaseRepository } from "../shared/repository/database-repository.interface";
 import { schedulingPayloadToClass } from "./helpers/Scheduling-payload-to-class.helper";
 import { Scheduling } from "./scheduling.entity";
 import { SchedulingId, SchedulingProps } from "./scheduling.interface";
+import { PostgresDatabase } from "../shared/database/db";
+import { logger } from "../shared/logger";
 
 export class SchedulingRepository implements DatabaseRepository<Scheduling> {
+  constructor(private readonly db: PostgresDatabase) {}
+
   async findAll(): Promise<Scheduling[]> {
-    const schedulingList = await db.orm.public.Scheduling.all();
+    const schedulingList = await this.db.orm.public.Scheduling.all();
     return schedulingList.map((scheduling) => {
       return schedulingPayloadToClass(scheduling);
     });
   }
   async findByDate(date: Date): Promise<Scheduling[]> {
-    const schedulingList = await db.orm.public.Scheduling.where({ date })
+    const schedulingList = await this.db.orm.public.Scheduling.where({ date })
       .orderBy((u) => u.date.desc())
       .all();
     return schedulingList.map((scheduling) => {
@@ -24,14 +27,16 @@ export class SchedulingRepository implements DatabaseRepository<Scheduling> {
     const numericId = Number(id);
 
     if (!Number.isInteger(numericId)) {
+      logger.error(`FindById error. Id ${numericId} is invalid. ${Scheduling.name}`)
       throw new SchedulingIdInvalidType(numericId);
     }
 
-    const scheduling = await db.orm.public.Scheduling.where({
+    const scheduling = await this.db.orm.public.Scheduling.where({
       id: numericId,
     }).first();
 
     if (!scheduling) {
+      logger.debug(`FindById error. Scheduling with id ${id} not found. ${Scheduling.name}`)
       throw new ResultNotFoundError(id, Scheduling.name);
     }
 
@@ -39,7 +44,7 @@ export class SchedulingRepository implements DatabaseRepository<Scheduling> {
   }
   async create(props: Scheduling): Promise<Scheduling> {
     const schedulingObject = props.toObject();
-    const scheduling = await db.orm.public.Scheduling.create({
+    const scheduling = await this.db.orm.public.Scheduling.create({
       carrier: schedulingObject.carrier,
       date: schedulingObject.date,
       dock: schedulingObject.dock,
@@ -57,15 +62,17 @@ export class SchedulingRepository implements DatabaseRepository<Scheduling> {
     const numericId = Number(_id);
 
     if (!Number.isInteger(numericId)) {
+      logger.error(`Update error. Id ${numericId} is invalid. ${Scheduling.name}`)
       throw new SchedulingIdInvalidType(numericId);
     }
 
     const { id, ...updateScheduleData } = props;
-    const scheduling = await db.orm.public.Scheduling.where({
+    const scheduling = await this.db.orm.public.Scheduling.where({
       id: numericId,
     }).update(updateScheduleData);
 
     if (!scheduling) {
+      logger.debug(`Update error. Scheduling with id ${id} not found. ${Scheduling.name}`)
       throw new ResultNotFoundError(id, Scheduling.name);
     }
 
@@ -75,14 +82,16 @@ export class SchedulingRepository implements DatabaseRepository<Scheduling> {
     const numericId = Number(id);
 
     if (!Number.isInteger(numericId)) {
+      logger.error(`remove error. Id ${numericId} is invalid. ${Scheduling.name}`)
       throw new SchedulingIdInvalidType(numericId);
     }
 
-    const scheduling = await db.orm.public.Scheduling.where({
+    const scheduling = await this.db.orm.public.Scheduling.where({
       id: numericId,
     }).delete();
 
     if (!scheduling) {
+      logger.debug(`Update error. Scheduling with id ${id} not found. ${Scheduling.name}`)
       throw new ResultNotFoundError(id, Scheduling.name);
     }
 

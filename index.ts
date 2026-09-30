@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config({ quiet: true });
 
 import startApp from "./src/app";
+import { logger } from "./src/shared/logger";
 
 const server = startApp();
 
@@ -14,10 +15,10 @@ try {
     },
     (err, address) => {
       if (err) {
-        console.log(err);
+        logger.fatal(`Exception: server not started. ${err.name}: ${err.message}`);
         process.exit(1);
       }
-      console.log(`Server listening at ${address}`);
+      logger.info(`Server listening at ${address}`);
     },
   );
 } catch (err: any) {}

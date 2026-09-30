@@ -11,6 +11,7 @@ import {
   waitUntilObjectNotExists,
 } from "@aws-sdk/client-s3";
 import { ObjectResult, S3ObjectOutput } from "./s3-object-output";
+import { logger } from "../logger";
 
 export class AwsS3FileStorage implements FileStorage {
   private bucketName = process.env.SCHEDULING_BUCKET;
@@ -26,7 +27,8 @@ export class AwsS3FileStorage implements FileStorage {
 
     try {
       const response = await this.s3.send(command);
-      console.log(response);
+      logger.info(`File uploaded to s3. ${response}`);
+
 
       return {
         Key: input.Key,
@@ -36,13 +38,13 @@ export class AwsS3FileStorage implements FileStorage {
         caught instanceof S3ServiceException &&
         caught.name === "EntityTooLarge"
       ) {
-        console.error(
+        logger.error(
           `Error from S3 while uploading object to ${this.bucketName}. \
 The object was too large. To upload objects larger than 5GB, use the S3 console (160GB max) \
 or the multipart upload API (5TB max)`,
         );
       } else if (caught instanceof S3ServiceException) {
-        console.error(
+        logger.error(
           `Error from S3 while uploading object to ${this.bucketName}.  ${caught.name}: ${caught.message}`,
         );
       }
@@ -83,17 +85,17 @@ or the multipart upload API (5TB max)`,
         { Bucket: this.bucketName, Key },
       );
 
-      console.log(`Object deleted. key: ${Key} - Bucket: ${this.bucketName}`);
+      logger.info(`Object deleted. key: ${Key} - Bucket: ${this.bucketName}`);
     } catch (caught) {
       if (
         caught instanceof S3ServiceException &&
         caught.name === "NoSuchBucket"
       ) {
-        console.error(
+        logger.error(
           `Error from S3 while deleting from ${this.bucketName}. Bucket not found.`,
         );
       } else if (caught instanceof S3ServiceException) {
-        console.error(
+        logger.error(
           `Error from S3 while deleting object from ${this.bucketName}. ${caught.name}: ${caught.message}`,
         );
       }
@@ -111,7 +113,7 @@ or the multipart upload API (5TB max)`,
       if (caught instanceof S3ServiceException && caught.name === "NotFound") {
         return false;
       } else if (caught instanceof S3ServiceException) {
-        console.error(
+        logger.error(
           `Error trying to find ${Key} from ${this.bucketName}. ${caught.name}: ${caught.message}`,
         );
       }
