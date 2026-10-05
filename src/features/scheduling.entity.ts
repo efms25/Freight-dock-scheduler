@@ -44,7 +44,7 @@ export class Scheduling {
 
     this.props.status = status;
   }
-
+  
   public addFile(filename: string) {
     this.props.files.push(filename);
   }

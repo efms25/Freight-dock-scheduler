@@ -1,4 +1,6 @@
+import { Readable } from "node:stream";
+
 export interface S3PutObjectInput {
     Key: string;
-    Body: Buffer | Uint8Array | string
+    Body: Readable | Buffer | Uint8Array | string
 }

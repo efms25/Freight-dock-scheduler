@@ -1,3 +1,4 @@
+import { UploadFile } from "../shared/upload-file.interface";
 import { ScheduleStatus } from "./schedule-status.enum";
 
 export type SchedulingId = number | string
@@ -9,12 +10,16 @@ export interface SchedulingProps {
   licensePlate: string;
   status: ScheduleStatus;
   date: Date,
-  files: Array<string>
+  files: string[]
 }
 
-export interface CreateSchedulingProps {
+export interface CreateSchedulingDto {
   dock: string;
   carrier: string;
   licensePlate: string;
-  files?: Array<string>
+  files?: UploadFile[]
+}
+
+export interface CreateSchedulingProps extends Omit<CreateSchedulingDto, "files"> {
+  files?: string[]
 }
