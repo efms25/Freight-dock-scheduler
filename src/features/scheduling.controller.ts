@@ -156,10 +156,10 @@ export class SchedulingController {
 
   public register = async (fastifyInstance: FastifyInstance) => {
     fastifyInstance.post("/scheduling", this.createScheduling.bind(this));
-    fastifyInstance.get("/scheduling", this.listScheduling.bind(this));
+    fastifyInstance.get("/scheduling/", this.listScheduling.bind(this));
     fastifyInstance.get("/scheduling/:id", this.getScheduling.bind(this));
     fastifyInstance.get(
-      "/scheduling/:date",
+      "/scheduling/date/:date",
       this.findByDateScheduling.bind(this),
     );
     fastifyInstance.patch("/scheduling/:id", this.updateScheduling.bind(this));
