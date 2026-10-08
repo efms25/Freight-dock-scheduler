@@ -5,14 +5,19 @@ import contractJson from "./contract.json" with { type: "json" };
 import { logger } from "../logger";
 
 export type PostgresDatabase = ReturnType<typeof postgres<Contract>>;
+const databaseUrl = process.env["DATABASE_URL"];
 
 export const db = (function () {
+  if(!databaseUrl) {
+     throw new Error("DATABASE_URL is not defined")
+  }
   try {
     return postgres<Contract>({
       contractJson,
-      url: process.env["DATABASE_URL"]!,
+      url: databaseUrl,
     });
   } catch (err) {
     logger.fatal(`Database connection error: ${err}`)
+    throw err
   }
 })();

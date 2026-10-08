@@ -41,8 +41,22 @@ export default function startApp() {
   // Register routes
   server.register(schedulingController.register, { prefix });
 
-  server.get("/health", async (request, reply) => {
-    return true;
+  server.get("/health", async (_, reply) => {
+    try {
+      const plan = db.raw.sql`SELECT 1`
+        .returnsRow({ result: "pg/int4@1" })
+        .build();
+
+      db.runtime().query(plan);
+
+      reply.status(200).send({
+        status: "ok",
+      });
+    } catch (errro) {
+      reply.status(503).send({
+        status: "unhealthy",
+      });
+    }
   });
 
   return server;
