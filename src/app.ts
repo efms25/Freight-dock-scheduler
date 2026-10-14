@@ -13,6 +13,9 @@ export default function startApp() {
 
   const server = Fastify({
     logger: true,
+    routerOptions: {
+      ignoreTrailingSlash: true
+    }
   });
 
   if (!db) {
