@@ -5,8 +5,8 @@ const env = process.env.NODE_ENV || "development";
 
 dotenv.config({ path: `.env.${env}`});
 
-import startApp from "./src/app";
-import { logger } from "./src/shared/logger";
+import startApp from "./app";
+import { logger } from "./shared/logger";
 
 const server = startApp();
 

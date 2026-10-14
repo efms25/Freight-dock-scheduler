@@ -37,7 +37,6 @@ export default function startApp() {
       files: 6,
     },
   });
-
   // Register routes
   server.register(schedulingController.register, { prefix });
 
