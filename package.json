@@ -7,7 +7,7 @@
     "dev": "tsx watch ./src/index.ts",
     "clean": "rimraf dist",
     "build": "npm run clean && esbuild src/index.ts --bundle --platform=node --format=esm --target=node24 --packages=external --sourcemap --outfile=dist/index.js",
-    "start": "tsx ./src/index.ts",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "contract:emit": "prisma contract emit",
     "postinstall": "prisma skills sync || exit 0"
