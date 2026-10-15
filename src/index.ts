@@ -3,7 +3,7 @@ dotenv.config({ quiet: true });
 
 const env = process.env.NODE_ENV || "development";
 
-dotenv.config({ path: `.env.${env}`});
+dotenv.config({ path: `.env.${env}` });
 
 import startApp from "./app";
 import { logger } from "./shared/logger";
@@ -16,10 +16,13 @@ try {
       port: process.env.SERVER_PORT
         ? Number.parseInt(process.env.SERVER_PORT)
         : 8080,
+      host: process.env.SERVER_HOST ?? "0.0.0.0",
     },
     (err, address) => {
       if (err) {
-        logger.fatal(`Exception: server not started. ${err.name}: ${err.message}`);
+        logger.fatal(
+          `Exception: server not started. ${err.name}: ${err.message}`,
+        );
         process.exit(1);
       }
       logger.info(`Server listening at ${address}`);
