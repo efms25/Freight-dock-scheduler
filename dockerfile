@@ -13,24 +13,32 @@ FROM node:24 AS builder
  COPY --from=deps /app/package.json ./
  COPY --from=deps /app/package-lock.json ./
  COPY --from=deps /app/node_modules ./node_modules
- COPY /src ./src
+ COPY ./src ./src
 
  RUN npm run build
 
+FROM node:24-slim AS prod
+
+ WORKDIR /app
+
+ COPY --from=builder /app/package.json ./
+ COPY --from=builder /app/package-lock.json ./
+
+ RUN npm ci --omit=dev --ignore-scripts
+ 
 FROM node:24-alpine AS runner
  
  WORKDIR /app
 
  COPY --from=builder /app/package.json ./
  COPY --from=builder /app/package-lock.json ./
- COPY --from=builder /app/node_modules ./node_modules
  COPY --from=builder /app/dist ./dist
+ COPY --from=prod /app/node_modules ./node_modules
 
  USER node
 
  EXPOSE 8080
 
- ENV node_env=production
- ENV DATABASE_URL=""
+ ENV NODE_ENV=production
 
- CMD ["npm", "start"]
+ ENTRYPOINT ["node", "dist/index.js"]
