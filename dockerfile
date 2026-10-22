@@ -1,3 +1,4 @@
+# --- Deps stage ---
 FROM node:24 AS deps
 
  WORKDIR /app
@@ -6,6 +7,7 @@ FROM node:24 AS deps
 
  RUN npm ci --ignore-scripts
 
+# --- Shared Builder Stage ---
 FROM node:24 AS builder
  
  WORKDIR /app
@@ -16,7 +18,9 @@ FROM node:24 AS builder
  COPY ./src ./src
 
  RUN npm run build
+ RUN npx prisma generate
 
+# --- Production install stage ---
 FROM node:24-slim AS prod
 
  WORKDIR /app
@@ -26,6 +30,7 @@ FROM node:24-slim AS prod
 
  RUN npm ci --omit=dev --ignore-scripts
  
+# --- Runner Stage ---
 FROM node:24-alpine AS runner
  
  WORKDIR /app
@@ -41,4 +46,19 @@ FROM node:24-alpine AS runner
 
  ENV NODE_ENV=production
 
- ENTRYPOINT ["node", "dist/index.js"]
+ CMD ["node", "dist/index.js"]
+
+
+# --- Prisma migration ---
+FROM deps AS migrate
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    PRISMA_DISABLE_TELEMETRY=1
+
+COPY prisma.config.ts ./
+COPY migrations ./migrations
+COPY src/shared/database ./src/shared/database
+
+CMD ["npx", "--no-install", "prisma", "db", "migrate", "--to", "production"]
