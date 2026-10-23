@@ -1,5 +1,5 @@
 # --- Deps stage ---
-FROM node:24 AS deps
+FROM node:24-slim AS deps
 
  WORKDIR /app
 
@@ -8,43 +8,34 @@ FROM node:24 AS deps
  RUN npm ci --ignore-scripts
 
 # --- Shared Builder Stage ---
-FROM node:24 AS builder
+FROM deps AS builder
  
  WORKDIR /app
 
- COPY --from=deps /app/package.json ./
- COPY --from=deps /app/package-lock.json ./
- COPY --from=deps /app/node_modules ./node_modules
  COPY ./src ./src
 
+ RUN npm run contract:emit
  RUN npm run build
- RUN npx prisma generate
 
 # --- Production install stage ---
-FROM node:24-slim AS prod
+FROM node:24-alpine AS prod
 
  WORKDIR /app
-
- COPY --from=builder /app/package.json ./
- COPY --from=builder /app/package-lock.json ./
-
+ COPY package.json package-lock.json ./
  RUN npm ci --omit=dev --ignore-scripts
  
 # --- Runner Stage ---
 FROM node:24-alpine AS runner
  
  WORKDIR /app
-
- COPY --from=builder /app/package.json ./
- COPY --from=builder /app/package-lock.json ./
- COPY --from=builder /app/dist ./dist
+ ENV NODE_ENV=production
+ COPY package.json ./
  COPY --from=prod /app/node_modules ./node_modules
+ COPY --from=builder /app/dist ./dist
 
  USER node
 
  EXPOSE 8080
-
- ENV NODE_ENV=production
 
  CMD ["node", "dist/index.js"]
 
@@ -60,5 +51,10 @@ ENV NODE_ENV=production \
 COPY prisma.config.ts ./
 COPY migrations ./migrations
 COPY src/shared/database ./src/shared/database
+
+#Prisma Checking
+RUN npx --no-install prisma --version
+
+USER node
 
 CMD ["npx", "--no-install", "prisma", "db", "migrate", "--to", "production"]
