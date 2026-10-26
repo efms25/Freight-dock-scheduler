@@ -11,7 +11,8 @@ FROM node:24-slim AS deps
 FROM deps AS builder
  
  WORKDIR /app
-
+ COPY prisma.config.ts ./
+ COPY tsconfig.json ./
  COPY ./src ./src
 
  RUN npm run contract:emit
